@@ -119,6 +119,10 @@ dist
 # Ignore bat
 *.bat
 
+# Ignore file
+invalidbatchars.txt
+
 # DO NOT IGNORE
 !Sorry.wav
 !Still.wav
+!package.json

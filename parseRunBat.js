@@ -1,6 +1,7 @@
 const fs = require('fs');
 let fileContent = fs.readFileSync('./run.bat');
 let fileContentMatchs = fileContent.toString().match(/".*?"/gs);
+// console.log(fileContentMatchs);
 let replacedFileContext = fileContent.toString();
 for (fileContentMatch of fileContentMatchs){
     if (fileContentMatch.includes('\r\n')){
@@ -15,4 +16,4 @@ for (fileContentMatch of fileContentMatchs){
     // console.log(fileContent.includes(fileContentMatch))
 }
 console.log(replacedFileContext)
-fs.writeFileSync('runParsed.bat', replacedFileContext);
+fs.writeFileSync('runParsed.bat', replacedFileContext, 'utf8');
