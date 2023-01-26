@@ -1,5 +1,6 @@
 // Setting initial variables
 const allAvailableParameters = 'node index.js "<googleApiKey>" "<textToBeSynthesized>" "<fileName>" <voiceLanguageCode> <voiceName>';
+const { exec } = require("child_process");
 
 // Parsing parameters
 // console.log(process.env)
@@ -18,6 +19,14 @@ if (msg == undefined) {
 	${allAvailableParameters}`);
 	return -1;
 }
+
+if (googleApiKey == "CONCAT") {
+	mergeTwoWavFiles('Sorry.wav', msg + '.wav', msg + '_2.wav');
+	mergeTwoWavFiles('Still.wav', msg + '.wav', msg + '_3.wav');
+	return 0;
+}
+
+// Reading rest of inputs
 let fileName = process.argv[4]; // || (msg + '_' + Date() + '.wav').replace(/\\|\/|\:|\*|\?|\"|\<|\>|\|/g, '');
 if (fileName == undefined) {
 	console.log(`Error - Please specify the file name to be used, example:
@@ -77,21 +86,25 @@ async function generateTTS(msg, voiceLanguageCode, voiceName, outputFile) {
 	}
 }
 
-const { exec } = require("child_process");
-function mergeTwoWavFiles(fileA, fileB, outputFile){
-	exec(`ffmpeg -i ${fileA} -i ${fileB} -filter_complex [0][1]concat=n=2:v=0:a=1[out] -map [out] ${outputFile}`, (error, stdout, stderr) => {
-		if (error) {
-			console.log(`error: ${error.message}`);
-			return;
-		}
-		if (stderr) {
-			// console.log(`stderr: ${stderr}`);
-			return;
-		}
-		// console.log(`stdout: ${stdout}`);
-		console.log('Created file ' + outputFile);
-	});
-	
+async function mergeTwoWavFiles(fileA, fileB, outputFile){
+	return new Promise((resolve, reject) => {
+		exec(`ffmpeg -i ${fileA} -i ${fileB} -filter_complex [0][1]concat=n=2:v=0:a=1[out] -map [out] ${outputFile}`, (error, stdout, stderr) => {
+			if (error) {
+				console.log(`error: ${error.message}`);
+				reject(error);
+			}
+			if (stderr) {
+				console.log('Created file ' + outputFile);
+				resolve(stderr);
+			}
+			if (stdout) {
+				console.log('Created file ' + outputFile);
+				resolve(stdout);
+			}
+			console.log('Delete already existing _2 and _3 files');
+			reject('Delete already existing _2 and _3 files');
+		});
+	})
 }
 
 // Main code
@@ -133,7 +146,11 @@ async function main() {
 	// Check if should create DTMF _2 and _3 files
 	if (fileName.toLocaleLowerCase().includes('menu')) {
 		console.log('Is a menu file, creating _2 _3 and DTMF wav files');
-		await generateTTS(msg.replace(/say.*?or /ig, ','), voiceLanguageCode, voiceName, fileNameWithoutWav + '_DTMF.wav');
+		if (fileName.toLocaleLowerCase().includes('menunoreg')) {
+			await generateTTS(msg, voiceLanguageCode, voiceName, fileNameWithoutWav + '_DTMF.wav');
+		} else {
+			await generateTTS(msg.replace(/say.*?or /ig, ','), voiceLanguageCode, voiceName, fileNameWithoutWav + '_DTMF.wav');
+		}
 		mergeTwoWavFiles('Sorry.wav', fileName, fileNameWithoutWav + '_2.wav');
 		mergeTwoWavFiles('Still.wav', fileNameWithoutWav + '_DTMF.wav', fileNameWithoutWav + '_3.wav');
 	}
