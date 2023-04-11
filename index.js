@@ -20,9 +20,15 @@ if (msg == undefined) {
 	return -1;
 }
 
+const voiceLanguageCode = process.argv[5] || "en-US";
+const voiceName = process.argv[6] || "en-US-Wavenet-C";
+
+const sorryFile = voiceName == "en-US-Wavenet-C" ? "Sorry.wav" : "Sorry_" + voiceName + ".wav";
+const stillFile = voiceName == "en-US-Wavenet-C" ? "Still.wav" : "Still_" + voiceName + ".wav";
+
 if (googleApiKey == "CONCAT") {
-	mergeTwoWavFiles('Sorry.wav', msg + '.wav', msg + '_2.wav');
-	mergeTwoWavFiles('Still.wav', msg + '.wav', msg + '_3.wav');
+	mergeTwoWavFiles(sorryFile, msg + '.wav', msg + '_2.wav');
+	mergeTwoWavFiles(stillFile, msg + '.wav', msg + '_3.wav');
 	return 0;
 }
 
@@ -43,8 +49,6 @@ if (fileName.slice(0, 2) != './' && fileName.slice(1, 2) != ':' && fileName.slic
 	fileName = './' + fileName;
 }
 const fileNameWithoutWav = fileName.slice(0, -4);
-const voiceLanguageCode = process.argv[5] || "en-US";
-const voiceName = process.argv[6] || "en-US-Wavenet-C";
 
 // Setting dependencies
 const {google} = require('googleapis');
@@ -101,8 +105,8 @@ async function mergeTwoWavFiles(fileA, fileB, outputFile){
 				console.log('Created file ' + outputFile);
 				resolve(stdout);
 			}
-			console.log('Delete already existing _2 and _3 files');
-			reject('Delete already existing _2 and _3 files');
+			// console.log('Delete already existing _2 and _3 files');
+			reject('Delete already existing files');
 		});
 	})
 }
@@ -146,13 +150,26 @@ async function main() {
 	// Check if should create DTMF _2 and _3 files
 	if (fileName.toLocaleLowerCase().includes('menu')) {
 		console.log('Is a menu file, creating _2 _3 and DTMF wav files');
+		try {
+			fs.rmSync(fileNameWithoutWav + '_DTMF.wav');
+		} catch (err) {}		
 		if (fileName.toLocaleLowerCase().includes('menunoreg')) {
 			await generateTTS(msg, voiceLanguageCode, voiceName, fileNameWithoutWav + '_DTMF.wav');
 		} else {
 			await generateTTS(msg.replace(/say.*?or /ig, ','), voiceLanguageCode, voiceName, fileNameWithoutWav + '_DTMF.wav');
 		}
-		mergeTwoWavFiles('Sorry.wav', fileName, fileNameWithoutWav + '_2.wav');
-		mergeTwoWavFiles('Still.wav', fileNameWithoutWav + '_DTMF.wav', fileNameWithoutWav + '_3.wav');
+		try {
+			fs.rmSync(fileNameWithoutWav + '_2.wav');
+		} catch (err) {}
+		try {
+			fs.rmSync(fileNameWithoutWav + '_3.wav');
+		} catch (err) {}
+		try {
+			fs.rmSync(fileNameWithoutWav + '_3WithSay.wav');
+		} catch (err) {}
+		mergeTwoWavFiles(sorryFile, fileName, fileNameWithoutWav + '_2.wav');
+		mergeTwoWavFiles(stillFile, fileNameWithoutWav + '_DTMF.wav', fileNameWithoutWav + '_3.wav');
+		mergeTwoWavFiles(stillFile, fileName, fileNameWithoutWav + '_3WithSay.wav');
 	}
 }
 
