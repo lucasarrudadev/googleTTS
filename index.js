@@ -133,7 +133,7 @@ async function main() {
 	}
 
 	// Check for currentStatus
-	if(currentStats.length >= 900000) {
+	if(currentStats.totalTextLength >= 900000) {
 		console.log(`Error - Already used montly free quota, blocking usage until end of month`);
 		return -2;
 	}
@@ -152,6 +152,7 @@ async function main() {
 		console.log('Is a menu file, creating _2 _3 and DTMF wav files');
 		try {
 			fs.rmSync(fileNameWithoutWav + '_DTMF.wav');
+			console.log('Deleted file: ' + fileNameWithoutWav + '_DTMF.wav');
 		} catch (err) {}		
 		if (fileName.toLocaleLowerCase().includes('menunoreg')) {
 			await generateTTS(msg, voiceLanguageCode, voiceName, fileNameWithoutWav + '_DTMF.wav');
@@ -160,12 +161,15 @@ async function main() {
 		}
 		try {
 			fs.rmSync(fileNameWithoutWav + '_2.wav');
+			console.log('Deleted file: ' + fileNameWithoutWav + '_2.wav');
 		} catch (err) {}
 		try {
 			fs.rmSync(fileNameWithoutWav + '_3.wav');
+			console.log('Deleted file: ' + fileNameWithoutWav + '_3.wav');
 		} catch (err) {}
 		try {
 			fs.rmSync(fileNameWithoutWav + '_3WithSay.wav');
+			console.log('Deleted file: ' + fileNameWithoutWav + '_3WithSay.wav');
 		} catch (err) {}
 		mergeTwoWavFiles(sorryFile, fileName, fileNameWithoutWav + '_2.wav');
 		mergeTwoWavFiles(stillFile, fileNameWithoutWav + '_DTMF.wav', fileNameWithoutWav + '_3.wav');
