@@ -1,9 +1,9 @@
 # Text to Audio Using GoogleTTS
 
-## Requirements
+## Depencencies
 - Node js (https://nodejs.org/en)
-- Google Cloud Account with API Key setup
-- ffmpeg (https://github.com/BtbN/FFmpeg-Builds/releases)
+- Google Cloud Account with API Key setup (https://support.google.com/googleapi/answer/6158862?hl=en)
+- ffmpeg (https://github.com/BtbN/FFmpeg-Builds/releases) (Windows Tip: .exe file should be placed somewhere the OS Env. Variable %PATH% points to, to see where %PATH points to run "echo %PATH%" at your Windows Computer CMD)
 
 ## Examples:
 - node index.js "ENV_VAR_GOOGLE_API_KEY" "December" "Dec"
@@ -16,4 +16,6 @@
   - Normal file
   - "\_2" file
   - "\_3" file
+  - "\_DTMF" file
   - "\_3WithSay" file
+- Create report file to track usage on the current month
