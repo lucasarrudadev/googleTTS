@@ -10,3 +10,10 @@
   -  Will read the Google API Key at the OS Env. Variable "ENV_VAR_GOOGLE_API_KEY" and use it to create a file named "Dec.wav" with the audio "December"
 - node index.js "ENV_VAR_GOOGLE_API_KEY" "Clientèle." "frenchExample" "fr-FR" "fr-FR-Wavenet-C"
   -  .. and use it to create a file named "frenchExample.wav" using "fr-FR" language with the voice "fr-FR-Wavenet-C" having the wording "Clientèle"
+
+## Additional Features:
+- If the file name has the wording "Menu" in it, 4 output wav files will bre created:
+  - Normal file
+  - "\_2" file
+  - "\_3" file
+  - "\_3WithSay" file
